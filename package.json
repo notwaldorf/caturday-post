@@ -1,0 +1,7 @@
+{
+  "name": "cat-push-notificaitons",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.12.4"
+  }
+}

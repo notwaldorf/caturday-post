@@ -1,0 +1,21 @@
+{
+  "name": "cat-push-messaging",
+  "private": true,
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "authors": [
+    "Monica Dinculescu <noms@google.com"
+  ],
+  "description": "Sends out cat notifications",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.0.0",
+    "platinum-push-messaging": "PolymerElements/platinum-push-messaging#^1.0.0"
+  }
+}
