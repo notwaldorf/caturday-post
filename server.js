@@ -26,9 +26,9 @@ app.get('/notification-data.json', function (req, res) {
   var messages = ["I live in a server",
                   "Hello? Is anyody there? Hello?",
                   "Thank you for subscribing to cat facts"];
-  var icons = ["http://i.imgur.com/fRIM0VX.png",
-               "http://i.imgur.com/jtKsmWk.gif",
-               "http://i.imgur.com/PZr3RGC.jpg"];
+  var icons = ["https://i.imgur.com/fRIM0VX.png",
+               "https://i.imgur.com/jtKsmWk.gif",
+               "https://i.imgur.com/PZr3RGC.jpg"];
 
   var index = Math.floor(Math.random() * 3);
 
