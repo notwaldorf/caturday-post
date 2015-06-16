@@ -1,8 +1,8 @@
 {
-  "name": "cat-push-notificaitons",
+  "name": "cat-push-notifications",
   "version": "1.0.0",
   "dependencies": {
     "express": "^4.12.4",
-		"body-parser": "^1.8.1"
+    "body-parser": "^1.8.1"
   }
 }
