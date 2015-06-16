@@ -2,3 +2,4 @@ bower_components
 node_modules
 public/manifest.json
 manifest.json
+npm-debug.log

@@ -109,11 +109,10 @@
 
         fetch('/subscription_change', {
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
+              "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
             },
             method: 'post',
-            body: JSON.stringify({'enabled': ppm.enabled, 'id': previousSubscriptionId})
+            body:'enabled=' + ppm.enabled + '&id=' + previousSubscriptionId
         }).then(function(response) {
           console.log('Response = ', response);
         }).catch(function(err) {

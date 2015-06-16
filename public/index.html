@@ -9,16 +9,31 @@
     <link href='http://fonts.googleapis.com/css?family=Lato:300,300italic' rel='stylesheet' type='text/css'>
 </head>
 
+<style>
+#count {
+  font-weight: bold;
+  font-size: 20px;
+}
+</style>
 <body>
   <div class="container">
     <button class='push-button'>push it</button>
+    <p>There are currently <span id="count" class="in">0</span> registered listeners</p>
     <br><br>
-
     <h1>Did you register for cat notifications?</h1>
     <p>If not, you need to enable push notifications <a href="register.html">here</a></p>
   </div>
 
   <script>
+    fetch('/get_subscription_count')
+      .then(function(response) {
+        response.json().then(function(data) {
+          document.getElementById('count').textContent = data.subscriptions;
+        });
+      })
+      .catch(function(err) {
+        console.log('Fetch Error :-S', err);
+      });
   </script>
 </body>
 
