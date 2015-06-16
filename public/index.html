@@ -17,7 +17,7 @@
 </style>
 <body>
   <div class="container">
-    <button class='push-button'>push it</button>
+    <button class='push-button' id="button">push it</button>
     <p>There are currently <span id="count" class="in">0</span> registered listeners</p>
     <br><br>
     <h1>Did you register for cat notifications?</h1>
@@ -34,6 +34,17 @@
       .catch(function(err) {
         console.log('Fetch Error :-S', err);
       });
+
+    document.getElementById('button').addEventListener('click', function(){
+      fetch('/push_cats')
+        .then(function(response) {
+          console.log('Response = ', response);
+        })
+        .catch(function(err) {
+          console.log('Fetch Error = ', err);
+        });
+    });
+
   </script>
 </body>
 
