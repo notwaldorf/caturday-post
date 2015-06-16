@@ -7,11 +7,12 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/public'));
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+app.set('port', process.env.PORT || 3000);
 
 var activeSubscriptionIds = [];
 
-var server = app.listen(3000, function () {
-  console.log('Started server at http://%s:%s', server.address().address, server.address().port);
+http.createServer(app).listen(app.get('port'), function() {
+  console.log('Started server on port ' + app.get('port'));
 });
 
 // This is what <platinum-push-messaging> uses as the notification content,
