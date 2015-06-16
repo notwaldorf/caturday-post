@@ -1,7 +1,7 @@
 {
   "name": "cat-push-notifications",
   "private": true,
-  "license": "http://polymer.github.io/LICENSE.txt",
+  "license": "MIT",
   "authors": [
     "Monica Dinculescu <noms@google.com>"
   ],

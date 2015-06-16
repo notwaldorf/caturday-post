@@ -1,5 +1,4 @@
 bower_components
 node_modules
-public/manifest.json
 npm-debug.log
-config.js
+.env

@@ -1,7 +1,6 @@
 var express    = require('express');
 var http       = require('http');
 var bodyParser = require("body-parser");
-var config = require('./config')
 
 var app = express();
 
@@ -14,7 +13,6 @@ var activeSubscriptionIds = [];
 var server = app.listen(3000, function () {
   console.log('Started server at http://%s:%s', server.address().address, server.address().port);
 });
-
 
 // This is what <platinum-push-messaging> uses as the notification content,
 // so we should intercept it and do something better with it. Like get it from
@@ -39,6 +37,13 @@ app.get('/notification-data.json', function (req, res) {
     'url': icons[index],
     'icon': icons[index],
     'tag': 'cat-push-notification'
+  });
+});
+
+app.get('/manifest.json', function (req, res) {
+  res.json({
+    "gcm_sender_id": process.env.GCM_SENDER,
+  	"gcm_user_visible_only": true
   });
 });
 
@@ -74,11 +79,15 @@ app.get('/push_cats', function (req, res) {
     "registration_ids":activeSubscriptionIds
   };
 
+  console.log(activeSubscriptionIds);
+
   var dataString =  JSON.stringify(data);
   var headers = {
-    'Authorization' : 'key=' + config.apiKey,
+    'Authorization' : 'key=' + process.env.API_KEY,
     'Content-Type' : 'application/json'
   };
+
+  console.log(headers)
 
   var options = {
     host: 'android.googleapis.com',

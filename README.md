@@ -3,23 +3,14 @@ Push notifications with cats
 
 
 # Configure it
-You need to add two files:
+You need to add a files:
 
-- a `config.js` file in the root of your project, that contains your api key. It
-should look something like this:
-
-```
-module.exports = {'apiKey': 'YOUR_SUPER_SECRET_API_KEY'};
-```
-- a `manifest.json` file in the `public` directory, that contains your GCM
+- a `.env` file in the root of your project, that contains your api key and gcm
 project id. It should look something like this:
 
 ```
-{
-	"gcm_sender_id": "YOUR_GCM_PROJECT_NUMBER",
-	"gcm_user_visible_only": true
-}
-
+GCM_SENDER=[YOUR_PROJECT_ID]
+API_KEY=[YOUR_API_KEY]
 ```
 
 # Install it
@@ -37,6 +28,11 @@ You start the server with
 
 ```
 node server.js
+```
+
+This is also heroku ready, so you can also start it with
+```
+foreman start
 ```
 
 In your browser, open two tabs:
