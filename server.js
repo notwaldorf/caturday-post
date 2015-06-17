@@ -2,25 +2,43 @@ var express    = require('express');
 var http       = require('http');
 var bodyParser = require("body-parser");
 
-var app = express();
+// Save the subscriptions since heroku kills free dynos like the ice age.
+var dirty = require('dirty');
+var db = dirty('subscriptions.db');
 
+var activeSubscriptionIds = [];
+var previousRequestTime = new Date();
+
+/**
+ * Setup
+ */
+
+// S-s-s-server.
+var app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname + '/public'));
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 app.set('port', process.env.PORT || 3000);
 
-var activeSubscriptionIds = [];
-var previousRequestTime = new Date();
-
-
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Started server on port ' + app.get('port'));
 });
 
-// This is what <platinum-push-messaging> uses as the notification content,
-// so we should intercept it and do something better with it. Like get it from
-// a giant cat server.
-app.get('/notification-data.json', function (req, res) {
+// Restore subscriptions.
+db.on('load', function() {
+  db.forEach(function(key, val) {
+    if (val)
+      activeSubscriptionIds.push(key);
+  });
+  console.log("Subscriptions loaded from database: " + activeSubscriptionIds.length);
+});
+
+/**
+ * This is what <platinum-push-messaging> uses as the notification content,
+ * so we should intercept it and do something better with it. Like get it from
+ * a giant cat server.
+ */
+ pp.get('/notification-data.json', function (req, res) {
   // Testing data
   var titles = ["I am a server cat",
                 "Halp I am a cat trapped in a push notification",
@@ -43,6 +61,9 @@ app.get('/notification-data.json', function (req, res) {
   });
 });
 
+/**
+ * I don't know how to load heroku config values into a json file.
+ */
 app.get('/manifest.json', function (req, res) {
   res.json({
     "gcm_sender_id": process.env.GCM_SENDER,
@@ -50,28 +71,37 @@ app.get('/manifest.json', function (req, res) {
   });
 });
 
-// Add or remove a client.
+/**
+ * Add or remove a subscription.
+ */
 app.post('/subscription_change', function (req, res) {
   var enabled = req.body.enabled;
   var id = req.body.id;
   var index = activeSubscriptionIds.indexOf(id);
 
   if (enabled == 'true') {
-    if (index == -1)
+    if (index == -1) {
+      db.set(id, true);
       activeSubscriptionIds.push(id);
+    }
   } else {
-    var index = activeSubscriptionIds.indexOf(id)
+    var index = activeSubscriptionIds.indexOf(id);
     activeSubscriptionIds.splice(index,1);
+    db.rm(id);
   }
   res.end();
 });
 
+/**
+ * Returns the number of known subscriptions (some could be inactive).
+ */
 app.get('/get_subscription_count', function (req, res) {
   res.json({'subscriptions': activeSubscriptionIds.length});
 });
 
-// Send cats to everyone!! But at most twice a minute.
-
+/**
+ * Send ヽ(^‥^=ゞ) to everyone!! But only once a minute because lol spam.
+ */
 app.get('/push_cats', function (req, res) {
   var elapsed = new Date() - previousRequestTime;
 
@@ -124,3 +154,20 @@ app.get('/push_cats', function (req, res) {
   req.end();
   previousRequestTime = new Date();
 });
+
+/**
+ * Try to close the database.  ¯\_(ツ)_/¯
+ */
+var gracefulShutdown = function() {
+  console.log("Received kill signal, shutting down gracefully.");
+  db.close();
+  server.close(function() {
+    console.log("Closed out remaining connections.");
+    process.exit()
+  });
+}
+
+// listen for TERM signal .e.g. kill
+process.on ('SIGTERM', gracefulShutdown);
+// listen for INT signal e.g. Ctrl-C
+process.on ('SIGINT', gracefulShutdown);
