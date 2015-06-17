@@ -10,6 +10,8 @@ app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 app.set('port', process.env.PORT || 3000);
 
 var activeSubscriptionIds = [];
+var previousRequestTime = new Date();
+
 
 http.createServer(app).listen(app.get('port'), function() {
   console.log('Started server on port ' + app.get('port'));
@@ -68,8 +70,16 @@ app.get('/get_subscription_count', function (req, res) {
   res.json({'subscriptions': activeSubscriptionIds.length});
 });
 
-// Send cats to everyone!!
+// Send cats to everyone!! But at most twice a minute.
+
 app.get('/push_cats', function (req, res) {
+  var elapsed = new Date() - previousRequestTime;
+
+  if ((elapsed / 1000) < 60) {
+    res.end('Request throttled');
+    return;
+  }
+
   var data = {
     "delayWhileIdle":true,
     "timeToLive":3,
@@ -80,15 +90,11 @@ app.get('/push_cats', function (req, res) {
     "registration_ids":activeSubscriptionIds
   };
 
-  console.log(activeSubscriptionIds);
-
   var dataString =  JSON.stringify(data);
   var headers = {
     'Authorization' : 'key=' + process.env.API_KEY,
     'Content-Type' : 'application/json'
   };
-
-  console.log(headers)
 
   var options = {
     host: 'android.googleapis.com',
@@ -116,5 +122,5 @@ app.get('/push_cats', function (req, res) {
 
   req.write(dataString);
   req.end();
-
+  previousRequestTime = new Date();
 });
