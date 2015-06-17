@@ -38,7 +38,7 @@ db.on('load', function() {
  * so we should intercept it and do something better with it. Like get it from
  * a giant cat server.
  */
- pp.get('/notification-data.json', function (req, res) {
+app.get('/notification-data.json', function (req, res) {
   // Testing data
   var titles = ["I am a server cat",
                 "Halp I am a cat trapped in a push notification",
