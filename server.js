@@ -61,7 +61,7 @@ app.post('/subscription_change', function (req, res) {
     var index = activeSubscriptionIds.indexOf(id)
     activeSubscriptionIds.splice(index,1);
   }
-  res.end("yes");
+  res.end();
 });
 
 app.get('/get_subscription_count', function (req, res) {

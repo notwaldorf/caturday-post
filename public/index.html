@@ -38,7 +38,7 @@
     text-decoration: none;
     letter-spacing: 1px;
     color: #666;
-    display: inline-block;
+    display: none;
     cursor: pointer;
     margin-top: 20px;
   }
@@ -67,7 +67,7 @@
         <h1 id="catsOn" hidden>You <span class="in">are</span> currently receiving cats!! <br>Do you want to stop?</h1>
         <p>Enable push notifications &nbsp; &nbsp;<paper-toggle-button id="enable-push" toggles></paper-toggle-button></p>
 
-        <span class="btn" hidden>
+        <span class="btn">
           <span class="text">push subscription debug</span>
           <div id="info">
             <pre class="code" id="subscription"></pre>
@@ -124,17 +124,16 @@
         catsOn.hidden = !toggle.checked;
         catsOff.hidden = toggle.checked;
 
-        fetch('/subscription_change', {
-            headers: {
-              "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-            },
-            method: 'post',
-            body:'enabled=' + ppm.enabled + '&id=' + previousSubscriptionId
-        }).then(function(response) {
-          console.log('Response = ', response);
-        }).catch(function(err) {
-          console.log('Fetch Error = ', err);
-        });
+        // <3 fetch() <3
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/subscription_change');
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+        // There's no response in the success case.
+        xhr.onerror = function() {
+          console.log("Couldn't send subscription to server.");
+        };
+        xhr.send('enabled=' + ppm.enabled + '&id=' + previousSubscriptionId);
       });
 
     });
