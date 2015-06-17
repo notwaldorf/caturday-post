@@ -6,6 +6,7 @@ body {
   color: #535353;
   margin: 0px;
   overflow: auto;
+  font-weight: 300;
 }
 
 ::selection {
@@ -45,6 +46,7 @@ h1 {
   margin: 30px auto;
   box-shadow: 0 0 0 25px #fff,
               0 0 0 30px rgba(35, 124, 234, 0);
+  cursor: pointer;
 }
 .push-button:not(:active) {
   -webkit-animation: effect 0.5s;

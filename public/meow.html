@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>meow</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,300italic' rel='stylesheet' type='text/css'>
+</head>
+
+<style>
+#count {
+  font-weight: bold;
+  font-size: 20px;
+}
+</style>
+<body>
+  <div class="container">
+    <button class='push-button' id="button">send cat</button>
+    <p>There are currently <span id="count" class="in">0</span> registered listeners</p>
+    <br><br>
+    <h1>Did you register for cat notifications?</h1>
+    <p>If not, you need to enable push notifications <a href="index.html">here</a></p>
+  </div>
+
+  <script>
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/get_subscription_count');
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      document.getElementById('count').textContent = xhr.response.subscriptions;
+    };
+    xhr.onerror = function() {
+      console.log("Blerg. Can't get number of subscriptions :(");
+    };
+    xhr.send();
+
+    document.getElementById('button').addEventListener('click', function() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/push_cats');
+      xhr.responseType = 'json';
+      xhr.onload = function() {
+        console.log(xhr.response);
+      };
+      xhr.onerror = function() {
+        console.log("Blerg. Could not send cats.");
+      };
+      xhr.send();
+    });
+
+  </script>
+</body>
+
+</html>

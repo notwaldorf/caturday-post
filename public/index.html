@@ -1,51 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta content='meow' name='title' />
-    <title>meow</title>
-    <meta content='width=460' name='viewport'>
-    <meta content='text/html; charset=utf-8' http-equiv='content-type' />
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link href='https://fonts.googleapis.com/css?family=Lato:300,300italic' rel='stylesheet' type='text/css'>
-</head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cat registration</title>
 
-<style>
-#count {
-  font-weight: bold;
-  font-size: 20px;
-}
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,300italic' rel='stylesheet' type='text/css'>
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+    <link rel="import" href="../bower_components/platinum-push-messaging/platinum-push-messaging.html">
+    <link rel="manifest" href="../manifest.json">
+  </head>
+
+<style is="custom-style">
+  paper-toggle-button {
+    --paper-toggle-button-unchecked-button-color: white;
+    --paper-toggle-button-checked-bar-color: #80DEEA;
+    --paper-toggle-button-checked-button-color: #00BCD4;
+    --paper-toggle-button-checked-ink-color: #00BCD4;
+  }
+
+  .container {
+    margin-top: 100px;
+  }
+
+  #info {
+    width: 400px;
+    display: none;
+  }
+
+  .btn {
+    background: #E0F7FA;
+    padding: 10px;
+    font-size: 12px;
+    border-radius: 3px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    color: #666;
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .btn .text {
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .btn:hover #info {
+    display: block;
+  }
 </style>
+
 <body>
+  <platinum-push-messaging message-url="../notification-data.json"></platinum-push-messaging>
+
   <div class="container">
-    <button class='push-button' id="button">push it</button>
-    <p>There are currently <span id="count" class="in">0</span> registered listeners</p>
-    <br><br>
-    <h1>Did you register for cat notifications?</h1>
-    <p>If not, you need to enable push notifications <a href="register.html">here</a></p>
+    <div id="unsupported" hidden>
+      <h1>Eeeeeek</h1>
+      <p>Your browser doesn't support push notifications 😿
+        <br>Here's a consolation cat.</p>
+      <img src="https://i.imgur.com/jtKsmWk.gif" alt="best gif of cat eating a pizza">
+    </div>
+    <div id="supported">
+        <h1 id="catsOff">You are <span class="in">not</span> currently receiving cats. <br>Do you want cats?</h1>
+        <h1 id="catsOn" hidden>You <span class="in">are</span> currently receiving cats!! <br>Do you want to stop?</h1>
+        <p>Enable push notifications &nbsp; &nbsp;<paper-toggle-button id="enable-push" toggles></paper-toggle-button></p>
+
+        <span class="btn" hidden>
+          <span class="text">push subscription debug</span>
+          <div id="info">
+            <pre class="code" id="subscription"></pre>
+          </div>
+        </span>
+    </div>
   </div>
 
   <script>
-    fetch('/get_subscription_count')
-      .then(function(response) {
-        response.json().then(function(data) {
-          document.getElementById('count').textContent = data.subscriptions;
-        });
-      })
-      .catch(function(err) {
-        console.log('Fetch Error :-S', err);
+    document.addEventListener('WebComponentsReady', function() {
+      var ppm = document.querySelector('platinum-push-messaging');
+      var toggle = document.getElementById('enable-push');
+      var subscription = document.getElementById('subscription');
+      var catsOn = document.getElementById('catsOn');
+      var catsOff = document.getElementById('catsOff');
+      var btn = document.querySelector('.btn');
+
+      var previousSubscriptionId;
+
+      // If push messaging isn't a thing, disable the ui.
+      toggle.disabled = !ppm.supported;
+
+      if (!ppm.supported) {
+        document.getElementById('supported').hidden = true;
+        document.getElementById('unsupported').hidden = false;
+        btn.style.display = 'none';
+      }
+
+      toggle.addEventListener('change', function() {
+        if (toggle.checked) {
+          ppm.enable();
+        } else {
+          ppm.disable();
+        }
       });
 
-    document.getElementById('button').addEventListener('click', function(){
-      fetch('/push_cats')
-        .then(function(response) {
+      ppm.addEventListener('subscription-changed', function(event) {
+        // GCM always needs the subscriptionId passed separately. Note that as of M45,
+        // the subscriptionId and the endpoint have merged.
+        var subscriptionId = ppm.subscription ? ppm.subscription.subscriptionId : undefined;
+        if (ppm.subscription && !ppm.subscription.subscriptionId) {
+          var endpointSections = ppm.subscription.endpoint.split('/');
+          subscriptionId = endpointSections[endpointSections.length - 1];
+        }
+        subscription.textContent = JSON.stringify(ppm.subscription || undefined, null, 2);
+
+        if (subscriptionId)
+          previousSubscriptionId = subscriptionId;
+      });
+
+      ppm.addEventListener('enabled-changed', function(event) {
+        toggle.checked = ppm.enabled;
+        btn.style.display = toggle.checked ? 'inline-block' : 'none';
+        catsOn.hidden = !toggle.checked;
+        catsOff.hidden = toggle.checked;
+
+        fetch('/subscription_change', {
+            headers: {
+              "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+            method: 'post',
+            body:'enabled=' + ppm.enabled + '&id=' + previousSubscriptionId
+        }).then(function(response) {
           console.log('Response = ', response);
-        })
-        .catch(function(err) {
+        }).catch(function(err) {
           console.log('Fetch Error = ', err);
         });
-    });
+      });
 
+    });
   </script>
 </body>
-
 </html>
