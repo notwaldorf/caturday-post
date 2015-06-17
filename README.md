@@ -1,4 +1,4 @@
-# push-cat-ifications
+# cat-push-notifications
 Push notifications with cats
 
 
