@@ -70,7 +70,7 @@ var manifest = {
   "start_url": "./?utm_source=web_app_manifest",
   "icons": [
     {
-      "src": "/public/images/caticon.png",
+      "src": "/images/caticon.png",
       "sizes": "192x192",
       "type": "image/png"
     }
