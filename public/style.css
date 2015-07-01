@@ -21,6 +21,11 @@ h1 {
   color: #F44336;
   font-style: italic;
 }
+
+.red {
+  color: #F44336;
+}
+
 .container {
   max-width: 600px;
   margin: 0 auto;
@@ -31,12 +36,11 @@ h1 {
 
 .push-button {
   font-family: 'Lato', 'Helvetica', Arial, sans-serif;
-  font-style: italic;
   font-weight: 100;
   display: block;
-  font-size: 30px;
-  width: 5em;
-  height: 5em;
+  font-size: 50px;
+  width: 3em;
+  height: 3em;
   border: none;
   background: #F44336;
   color: #fff;
@@ -89,4 +93,19 @@ a:hover {
   border-radius: 3px;
   text-align: left;
   word-wrap: break-word;
+}
+
+#footer {
+    margin-top: 100px;
+    padding-top: 20px;
+    border-top: 2px solid #80DEEA;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+#footer > p {
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .2em;
+    padding-right: 6px;
 }

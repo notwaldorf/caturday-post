@@ -1,11 +1,11 @@
 {
-  "name": "cat-push-notifications",
+  "name": "caturday-post",
   "private": true,
   "license": "MIT",
   "authors": [
     "Monica Dinculescu <noms@google.com>"
   ],
-  "description": "Sends out cat notifications",
+  "description": "Sends out cat push notifications using Polymer",
   "ignore": [
     "**/.*",
     "node_modules",

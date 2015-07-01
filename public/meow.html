@@ -17,12 +17,16 @@
 </style>
 <body>
   <div class="container">
-    <button class='push-button' id="button">send cat</button>
+    <button class='push-button' id="button">🐱</button>
     <p>There are currently <span id="count" class="in">0</span> registered listeners</p>
-    <p>(Only one 🐱 can be sent every minute because spam. Deal with it)</p>
     <br><br>
     <h1>Did you register for cat notifications?</h1>
     <p>If not, you need to enable push notifications <a href="index.html">here</a></p>
+
+    <div id="footer">
+        <p>made with <span class="red">❤︎</span> by <a href="https://twitter.com/notwaldorf">monica</a>.
+        find this on <a href="https://github.com/notwaldorf/caturday-post">github</a></p>
+    </div>
   </div>
 
   <script>
@@ -30,7 +34,8 @@
     xhr.open('GET', '/get_subscription_count');
     xhr.responseType = 'json';
     xhr.onload = function() {
-      document.getElementById('count').textContent = xhr.response.subscriptions;
+      if (xhr.response)
+        document.getElementById('count').textContent = xhr.response.subscriptions;
     };
     xhr.onerror = function() {
       console.log("Blerg. Can't get number of subscriptions :(");
