@@ -64,11 +64,25 @@ app.get('/notification-data.json', function (req, res) {
 /**
  * I don't know how to load heroku config values into a json file.
  */
+var manifest = {
+  "short_name": "Caturday Post",
+  "name": "Caturday Post",
+  "start_url": "./?utm_source=web_app_manifest",
+  "icons": [
+    {
+      "src": "/public/images/caticon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "display": "standalone",
+  "orientation": "portrait",
+  "gcm_sender_id": process.env.GCM_SENDER,
+  "gcm_user_visible_only": true
+}
+
 app.get('/manifest.json', function (req, res) {
-  res.json({
-    "gcm_sender_id": process.env.GCM_SENDER,
-  	"gcm_user_visible_only": true
-  });
+  res.json(manifest);
 });
 
 /**
