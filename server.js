@@ -7,7 +7,7 @@ var dirty = require('dirty');
 var db = dirty('subscriptions.db');
 
 var activeSubscriptionIds = [];
-var previousRequestTime = new Date();
+var previousRequestTime = 0;
 
 /**
  * Setup
