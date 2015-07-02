@@ -7,7 +7,7 @@ var dirty = require('dirty');
 var db = dirty('subscriptions.db');
 
 var activeSubscriptionIds = [];
-var previousRequestTime = new Date();
+var previousRequestTime = 0;
 
 /**
  * Setup
@@ -64,22 +64,8 @@ app.get('/notification-data.json', function (req, res) {
 /**
  * I don't know how to load heroku config values into a json file.
  */
-var manifest = {
-  "short_name": "Caturday Post",
-  "name": "Caturday Post",
-  "start_url": "./?utm_source=web_app_manifest",
-  "icons": [
-    {
-      "src": "/images/caticon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ],
-  "display": "standalone",
-  "orientation": "portrait",
-  "gcm_sender_id": process.env.GCM_SENDER,
-  "gcm_user_visible_only": true
-}
+var manifest = require('./manifest.json');
+manifest.gcm_sender_id = process.env.GCM_SENDER;
 
 app.get('/manifest.json', function (req, res) {
   res.json(manifest);
