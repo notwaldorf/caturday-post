@@ -1,10 +1,10 @@
 var express    = require('express');
 var http       = require('http');
 var bodyParser = require("body-parser");
+var Promise    = require('es6-promise').Promise;
 
 // Save the subscriptions since heroku kills free dynos like the ice age.
-var dirty = require('dirty');
-var db = dirty('subscriptions.db');
+var mongodb = require('mongodb');
 
 var activeSubscriptionIds = [];
 var previousRequestTime = 0;
@@ -25,12 +25,24 @@ http.createServer(app).listen(app.get('port'), function() {
 });
 
 // Restore subscriptions.
-db.on('load', function() {
-  db.forEach(function(key, val) {
-    if (val)
-      activeSubscriptionIds.push(key);
+var databasePromise = new Promise(function(resolve, reject) {
+  mongodb.MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
+    if (err) {
+      return reject(err);
+    }
+    resolve(db);
   });
-  console.log("Subscriptions loaded from database: " + activeSubscriptionIds.length);
+});
+
+databasePromise.then(function(db) {
+  db.collection('subscriptions').find({}).toArray(function(err, result) {
+    activeSubscriptionIds = result.map(function(subscription) {
+      return subscription.id;
+    });
+    console.log("Subscriptions loaded from database: " + activeSubscriptionIds.length);
+  });
+}).catch(function(err) {
+  console.log('DATABASE ERROR:', err, err.stack);
 });
 
 /**
@@ -81,13 +93,16 @@ app.post('/subscription_change', function (req, res) {
 
   if (enabled == 'true') {
     if (index == -1) {
-      db.set(id, true);
+      databasePromise.then(function(db) {
+        db.collection('subscriptions').insert([{id: id}]);
+      });
       activeSubscriptionIds.push(id);
     }
   } else {
-    var index = activeSubscriptionIds.indexOf(id);
-    activeSubscriptionIds.splice(index,1);
-    db.rm(id);
+    activeSubscriptionIds.splice(index, 1);
+    databasePromise.then(function(db) {
+      db.collection('subscriptions').remove({id: id});
+    });
   }
   res.end();
 });
@@ -160,10 +175,13 @@ app.get('/push_cats', function (req, res) {
  */
 var gracefulShutdown = function() {
   console.log("Received kill signal, shutting down gracefully.");
-  db.close();
-  server.close(function() {
-    console.log("Closed out remaining connections.");
-    process.exit()
+  databasePromise.then(function(db) {
+    db.close();
+  }).then(function() {
+    server.close(function() {
+      console.log("Closed out remaining connections.");
+      process.exit()
+    });
   });
 }
 

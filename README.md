@@ -16,14 +16,40 @@ don't trust all y'all internet people to not spam me.
 🎉😻🎉
 
 # Configure it
-You need to add a file:
+There are three items that need to be configured. The ID of your Google
+Developer Console project, the corresponding API key, and the URL of your
+MongoDB database.
 
-- a `.env` file in the root of your project, that contains your api key and gcm
-project id. It should look something like this:
+To find the first two, enable the API through the [getting started flow][1].
+Ignore that it says it is setting up an Android project, and ensure that you
+enable Google Cloud Messaging.
+
+You can either set up your own MongoDB server, or add one to your heroku app
+with:
+
+`heroku addons:create mongolab`
+
+You can then see the URL of your instance with
+
+`heroku config`.
+
+Now you need to add a file:
+
+- a `.env` file in the root of your project, that contains your config values.
+This sets the config that should be used by the Heroku `foreman` tool. It should
+look something like this:
 
 ```
 GCM_SENDER=[YOUR_PROJECT_ID]
 API_KEY=[YOUR_API_KEY]
+MONGOLAB_URI=[YOUR_MONGODB_URL]
+```
+
+If you want to publicly deploy your app to Heroku you will also need to set the
+config values on your live app:
+
+```
+heroku config:set GCM_SENDER=[YOUR_PROJECT_ID] API_KEY=[YOUR_API_KEY]
 ```
 
 # Install it
@@ -57,3 +83,5 @@ You will have to enable push notifications for this to work.
 
 
 Then watch the 🐱 roll in.
+
+[1]: https://developers.google.com/mobile/add?platform=android&cntapi=gcm&cntpkg=com.example&cntapp=Caturday%20Post
