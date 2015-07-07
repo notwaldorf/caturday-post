@@ -2,6 +2,7 @@ var express    = require('express');
 var http       = require('http');
 var bodyParser = require("body-parser");
 var Promise    = require('es6-promise').Promise;
+var request    = require("request");
 
 // Save the subscriptions since heroku kills free dynos like the ice age.
 var mongodb = require('mongodb');
@@ -52,24 +53,40 @@ databasePromise.then(function(db) {
  */
 app.get('/notification-data.json', function (req, res) {
   // Testing data
-  var titles = ["I am a server cat",
-                "Halp I am a cat trapped in a push notification",
-                "Meow"];
-  var messages = ["I live in a server",
-                  "Hello? Is anyody there? Hello?",
-                  "Thank you for subscribing to cat facts"];
-  var icons = ["https://i.imgur.com/fRIM0VX.png",
-               "https://i.imgur.com/jtKsmWk.gif",
-               "https://i.imgur.com/PZr3RGC.jpg"];
+  var titles = ['Halp I am a cat trapped in a push notification',
+                'And now, a haiku:'];
 
-  var index = Math.floor(Math.random() * 3);
+  // From http://www.adoptacatfoundation.org/cat_haikus.htm.
+  // If you want to contribute with a haiku, please send a PR! :)
+  var haikus = [
+      'Is anybody there?\n\nHello?',
+      'The food in my bowl\nIs old, and more to the point\nContains no tuna.',
+      'So you want to play.\nWill I claw at dancing string?\nYour ankle\'s closer.',
+      'There\'s no dignity\nIn being sick: which is why\nI don\'t tell you where.',
+      'Seeking solitude\nI am locked in the closet.\nFor once I need you.',
+      'Tiny can, dumped in plastic bowl\nPresentation, One star;\nService: none.',
+      'Am I in your way?\nYou seem to have it backwards:\nThis pillow\'s taken.',
+      'Your mouth is moving;\nUp and down, emitting noise.\nI\'ve lost interest.',
+      'The dog wags his tail,\nSeeking approval. See mine?\nDifferent message.',
+      'My brain: walnut-sized.\nYours: largest among primates.\nYet, who leaves for work?',
+      'Most problems can be\nIgnored. The more difficult\nOnes can be slept through.',
+      'My affection is conditional.\nDon\'t stand up,\nIt\'s your lap I love.',
+      'Cats can\'t steal the breath\nOf children. But if my tail\'s\nPulled again, I\'ll learn.',
+      'I don\'t mind being\nTeased, any more than you mind\nA skin graft or two.',
+      'So you call this thing\nYour cat carrier. I call\nThese my blades of death.',
+      'Toy mice, dancing yarn\nMeowing sounds.\nI\'m convinced: You\'re an idiot.'
+    ];
 
-  res.json({
-    'title': titles[index],
-    'message': messages[index],
-    'url': icons[index],
-    'icon': icons[index],
-    'tag': 'cat-push-notification'
+  request("http://cats.nanobit.org/url", function(error, response, body) {
+    var index = Math.floor(Math.random() * haikus.length);
+
+    res.json({
+      'title': index == 0 ? titles[0] : titles[1],
+      'message': haikus[index],
+      'url': body,
+      'icon': body,
+      'tag': 'cat-push-notification'
+    });
   });
 });
 
@@ -121,7 +138,7 @@ app.get('/push_cats', function (req, res) {
   var elapsed = new Date() - previousRequestTime;
 
   if ((elapsed / 1000) < 60) {
-    res.end('Request throttled');
+    res.end('Request throttled. No cat spam!');
     return;
   }
 
