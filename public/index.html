@@ -106,66 +106,64 @@
     //   }
     // }
 
-    document.addEventListener('WebComponentsReady', function() {
-      var ppm = document.querySelector('platinum-push-messaging');
-      var toggle = document.getElementById('enable-push');
-      var subscription = document.getElementById('subscription');
-      var catsOn = document.getElementById('catsOn');
-      var catsOff = document.getElementById('catsOff');
-      var btn = document.querySelector('.btn');
+    var ppm = document.querySelector('platinum-push-messaging');
+    var toggle = document.getElementById('enable-push');
+    var subscription = document.getElementById('subscription');
+    var catsOn = document.getElementById('catsOn');
+    var catsOff = document.getElementById('catsOff');
+    var btn = document.querySelector('.btn');
 
-      var previousSubscriptionId;
+    var previousSubscriptionId;
 
-      // If push messaging isn't a thing, disable the ui.
-      toggle.disabled = !ppm.supported;
+    // If push messaging isn't a thing, disable the ui.
+    toggle.disabled = !ppm.supported;
 
-      if (!ppm.supported) {
-        document.getElementById('supported').hidden = true;
-        document.getElementById('unsupported').hidden = false;
-        btn.style.display = 'none';
+    if (!ppm.supported) {
+      document.getElementById('supported').hidden = true;
+      document.getElementById('unsupported').hidden = false;
+      btn.style.display = 'none';
+    }
+
+    toggle.addEventListener('change', function() {
+      if (toggle.checked) {
+        ppm.enable();
+      } else {
+        ppm.disable();
       }
-
-      toggle.addEventListener('change', function() {
-        if (toggle.checked) {
-          ppm.enable();
-        } else {
-          ppm.disable();
-        }
-      });
-
-      ppm.addEventListener('subscription-changed', function(event) {
-        // GCM always needs the subscriptionId passed separately. Note that as of M45,
-        // the subscriptionId and the endpoint have merged.
-        var subscriptionId = ppm.subscription ? ppm.subscription.subscriptionId : undefined;
-        if (ppm.subscription && !ppm.subscription.subscriptionId) {
-          var endpointSections = ppm.subscription.endpoint.split('/');
-          subscriptionId = endpointSections[endpointSections.length - 1];
-        }
-        subscription.textContent = JSON.stringify(ppm.subscription || undefined, null, 2);
-
-        if (subscriptionId)
-          previousSubscriptionId = subscriptionId;
-      });
-
-      ppm.addEventListener('enabled-changed', function(event) {
-        toggle.checked = ppm.enabled;
-        btn.style.display = toggle.checked ? 'inline-block' : 'none';
-        catsOn.hidden = !toggle.checked;
-        catsOff.hidden = toggle.checked;
-
-        // <3 fetch() <3
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/subscription_change');
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
-
-        // There's no response in the success case.
-        xhr.onerror = function() {
-          console.log("Couldn't send subscription to server.");
-        };
-        xhr.send('enabled=' + ppm.enabled + '&id=' + previousSubscriptionId);
-      });
-
     });
+
+    ppm.addEventListener('subscription-changed', function(event) {
+      // GCM always needs the subscriptionId passed separately. Note that as of M45,
+      // the subscriptionId and the endpoint have merged.
+      var subscriptionId = ppm.subscription ? ppm.subscription.subscriptionId : undefined;
+      if (ppm.subscription && !ppm.subscription.subscriptionId) {
+        var endpointSections = ppm.subscription.endpoint.split('/');
+        subscriptionId = endpointSections[endpointSections.length - 1];
+      }
+      subscription.textContent = JSON.stringify(ppm.subscription || undefined, null, 2);
+
+      if (subscriptionId)
+        previousSubscriptionId = subscriptionId;
+    });
+
+    ppm.addEventListener('enabled-changed', function(event) {
+      toggle.checked = ppm.enabled;
+      btn.style.display = toggle.checked ? 'inline-block' : 'none';
+      catsOn.hidden = !toggle.checked;
+      catsOff.hidden = toggle.checked;
+
+      // <3 fetch() <3
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/subscription_change');
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+      // There's no response in the success case.
+      xhr.onerror = function() {
+        console.log("Couldn't send subscription to server.");
+      };
+      xhr.send('enabled=' + ppm.enabled + '&id=' + previousSubscriptionId);
+    });
+
   </script>
 </body>
 </html>
