@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="images/caticon.png">
     <link rel="apple-touch-icon" sizes="192x192" href="images/caticon.png" />
-    
+
     <title>caturday post registration</title>
 
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -66,6 +66,15 @@
         <br>Here's a consolation cat.</p>
       <img src="https://i.imgur.com/jtKsmWk.gif" alt="best gif of cat eating a pizza">
     </div>
+
+    <div id="use-https" hidden>
+      <h1>Eeeeek. Why aren't you using https?</h1>
+      <p>This demo uses ServiceWorkers, which only work over https. 😿
+        <br>Go <a href="https://caturday-post.herokuapp.com/">here</a> instead.</p>
+        <br>
+      <img src="https://media.giphy.com/media/PH07vT6Z6hxGo/giphy.gif" alt="squirrel flying a plane">
+    </div>
+
     <div id="supported">
         <h1 id="catsOff">You are <span class="in">not</span> currently receiving cats. <br>Do you want cats?</h1>
         <h1 id="catsOn" hidden>You <span class="in">are</span> currently receiving cats!! <br>Do you want to stop?</h1>
@@ -89,6 +98,14 @@
   </div>
 
   <script>
+    window.onload = function() {
+      // Show a warning if you're holding https wrong.
+      if (location.protocol !== 'https:') {
+        document.getElementById('supported').hidden = true;
+        document.getElementById('use-https').hidden = false;
+      }
+    }
+
     document.addEventListener('WebComponentsReady', function() {
       var ppm = document.querySelector('platinum-push-messaging');
       var toggle = document.getElementById('enable-push');
