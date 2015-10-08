@@ -98,13 +98,13 @@
   </div>
 
   <script>
-    // window.onload = function() {
-    //   // Show a warning if you're holding https wrong.
-    //   if (location.protocol !== 'https:') {
-    //     document.getElementById('supported').hidden = true;
-    //     document.getElementById('use-https').hidden = false;
-    //   }
-    // }
+    window.onload = function() {
+      // Show a warning if you're holding https wrong.
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        document.getElementById('supported').hidden = true;
+        document.getElementById('use-https').hidden = false;
+      }
+    }
 
     var ppm = document.querySelector('platinum-push-messaging');
     var toggle = document.getElementById('enable-push');
