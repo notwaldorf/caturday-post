@@ -59,7 +59,6 @@ app.get('/notification-data.json', function (req, res) {
   // From http://www.adoptacatfoundation.org/cat_haikus.htm.
   // If you want to contribute with a haiku, please send a PR! :)
   var haikus = [
-      'Is anybody there?\n\nHello?',
       'The food in my bowl\nIs old, and more to the point\nContains no tuna.',
       'So you want to play.\nWill I claw at dancing string?\nYour ankle\'s closer.',
       'There\'s no dignity\nIn being sick: which is why\nI don\'t tell you where.',
