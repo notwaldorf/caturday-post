@@ -142,17 +142,6 @@ app.get('/push_cats', function (req, res) {
     return;
   }
 
-  var data = {
-    "delayWhileIdle":true,
-    "timeToLive":3,
-    "data":{
-      'title': 'this is an important cat notification',
-      'message': 'click on it. click on the cat.'
-    },
-    "registration_ids":activeSubscriptionIds
-  };
-
-  var dataString =  JSON.stringify(data);
   var headers = {
     'Authorization' : 'key=' + process.env.API_KEY,
     'Content-Type' : 'application/json'
@@ -166,24 +155,50 @@ app.get('/push_cats', function (req, res) {
     headers: headers
   };
 
-  var req = http.request(options, function(res) {
-    res.setEncoding('utf-8');
-    var responseString = '';
+  // GCM only allows 1000 ids at a time, so we beed to batch them in two.
+  // Future monica: past monica has obviously only thought up to 2000 ids.
+  // Hopefully by then you would've figured out a way to clear the stale IDs. 
+  var ids = [];
+  if (activeSubscriptionIds.length > 1000) {
+    ids.push(activeSubscriptionIds.slice(0, 999));
+    ids.push(activeSubscriptionIds.slice(1000));
+  } else {
+    ids.push(activeSubscriptionIds);
+  }
 
-    res.on('data', function(data) {
-      responseString += data;
-    });
-    res.on('end', function() {
-      console.log(responseString);
-    });
-    console.log('STATUS: ' + res.statusCode);
-  });
-  req.on('error', function(e) {
-    console.log('error : ' + e.message + e.code);
-  });
+  for (var i = 0; i < ids.length; i++) {
+    var data = {
+      "delayWhileIdle":true,
+      "timeToLive":3,
+      "data":{
+        'title': 'this is an important cat notification',
+        'message': 'click on it. click on the cat.'
+      },
+      "registration_ids":ids[i]
+    };
+    var dataString =  JSON.stringify(data);
 
-  req.write(dataString);
-  req.end();
+    var req = http.request(options, function(res) {
+      res.setEncoding('utf-8');
+      var responseString = '';
+
+      res.on('data', function(data) {
+        responseString += data;
+      });
+      res.on('end', function() {
+        // TODO: figure out how to clear the failed IDs.
+        console.log('response' + responseString);
+      });
+      console.log('STATUS: ' + res.statusCode);
+    });
+    req.on('error', function(e) {
+      console.log('error : ' + e.message + e.code);
+    });
+
+    req.write(dataString);
+    req.end();
+  }
+
   previousRequestTime = new Date();
 });
 
